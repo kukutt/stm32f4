@@ -15,8 +15,8 @@
 
 
 
-#define SRAM_BASE                   ((uint32_t)0x20000000)
-#define RAM_SIZE                    0x2000ul
+#define SRAM_START                  ((uint32_t)0x20000000)
+#define SRAM_END                    ((uint32_t)0x20002000)
 
 #define BOOT_PARA_ADDRESS           (0x3ff00)
 

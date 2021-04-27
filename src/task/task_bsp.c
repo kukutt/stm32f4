@@ -11,7 +11,7 @@
 
 
 uint32_t task_bsp_time(void){
-    return /* bsp 返回1ms的计时器 */;
+    return HAL_GetTick();/* bsp 返回1ms的计时器 */;
 }
 
 /* 检查是否超时,考虑溢出问题 */

@@ -9,8 +9,68 @@
 */
 #include "g.h"
 
+UART_HandleTypeDef UartHandle;
+#define USARTx                           USART1
+#define USARTx_CLK_ENABLE()              __HAL_RCC_USART1_CLK_ENABLE();
+#define USARTx_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
+#define USARTx_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE() 
+
+#define USARTx_FORCE_RESET()             __HAL_RCC_USART1_FORCE_RESET()
+#define USARTx_RELEASE_RESET()           __HAL_RCC_USART1_RELEASE_RESET()
+    
+/* Definition for USARTx Pins */
+#define USARTx_TX_PIN                    GPIO_PIN_9
+#define USARTx_TX_GPIO_PORT              GPIOA  
+#define USARTx_TX_AF                     GPIO_AF7_USART1
+#define USARTx_RX_PIN                    GPIO_PIN_10
+#define USARTx_RX_GPIO_PORT              GPIOA 
+#define USARTx_RX_AF                     GPIO_AF7_USART1
+
 s32_t debug_init(void){
+    GPIO_InitTypeDef  GPIO_InitStruct;
+
+    /*##-1- Enable peripherals and GPIO Clocks #################################*/
+    /* Enable GPIO TX/RX clock */
+    USARTx_TX_GPIO_CLK_ENABLE();
+    USARTx_RX_GPIO_CLK_ENABLE();
+    /* Enable USART2 clock */
+    USARTx_CLK_ENABLE();
+
+    /*##-2- Configure peripheral GPIO ##########################################*/
+    /* UART TX GPIO pin configuration  */
+    GPIO_InitStruct.Pin       = USARTx_TX_PIN;
+    GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull      = GPIO_NOPULL;
+    GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
+    GPIO_InitStruct.Alternate = USARTx_TX_AF;
+
+    HAL_GPIO_Init(USARTx_TX_GPIO_PORT, &GPIO_InitStruct);
+
+    /* UART RX GPIO pin configuration  */
+    GPIO_InitStruct.Pin = USARTx_RX_PIN;
+    GPIO_InitStruct.Alternate = USARTx_RX_AF;
+
+    HAL_GPIO_Init(USARTx_RX_GPIO_PORT, &GPIO_InitStruct);
+  
+    UartHandle.Instance          = USARTx;
+    UartHandle.Init.BaudRate     = 115200;
+    UartHandle.Init.WordLength   = UART_WORDLENGTH_8B;
+    UartHandle.Init.StopBits     = UART_STOPBITS_1;
+    UartHandle.Init.Parity       = UART_PARITY_NONE;
+    UartHandle.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
+    UartHandle.Init.Mode         = UART_MODE_TX_RX;
+    UartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
+    
+    if(HAL_UART_Init(&UartHandle) != HAL_OK){
+        while(1);
+    }
     return 0;
+}
+
+int fputc(int ch, FILE *f){
+    s8_t tmp = ch;
+    HAL_UART_Transmit(&UartHandle, (uint8_t*)&tmp, 1, 500);
+    return ch;
 }
 
 #ifdef BOOTFLG
@@ -20,12 +80,9 @@ s32_t debug_init(void){
 #endif
 uint8_t saveuart[MAXUARTLEN+4];
 uint16_t saveuarti=0;
-
 int debug_loop(void){
     char g_uartData;
-    if(/* ¿¿¿¿¿¿¿ */){
-        /* ¿¿¿¿¿¿¿ */
-        g_uartData = /* ¿¿¿¿ */
+    if(HAL_UART_Receive(&UartHandle, (uint8_t *)&g_uartData, 1, 500) == HAL_OK){
         if ((g_uartData == '\r') || (g_uartData == '\n') || (g_uartData == ';') || (saveuarti > MAXUARTLEN)){
             saveuart[saveuarti] = 0;
             printf("\r\n");
@@ -43,8 +100,8 @@ int debug_loop(void){
                 IAP_UpdateCheck(1);
 #endif
             }else if (0 == memcmp("iap_init", saveuart, 8)){
-                /* flash¿¿¿¿¿ */
-		printf("req:init ok");
+                HAL_FLASH_Unlock();
+                printf("req:init ok");
             }else if (0 == memcmp("iap_read", saveuart, 8)){
                 s8_t *p;
                 u32_t addr = strtoul((char *)&saveuart[8], &p, 16);
@@ -53,7 +110,7 @@ int debug_loop(void){
                 printnameandhex("read", (char *)addr, len);
             }else if (0 == memcmp("iap_erase", saveuart, 9)){
                 u32_t addr = strtoul((char *)&saveuart[9], NULL, 16);
-                while(Ok != Flash_SectorErase(addr));
+                //while(Ok != Flash_SectorErase(addr));
 		/* flash¿¿ */
                 printf("req:erase ok [%08x]\r\n", addr);
             }else if (0 == memcmp("iap_write", saveuart, 9)){
@@ -65,14 +122,14 @@ int debug_loop(void){
                 p+=1;
                 u32_t len = strlen(p);
                 u32_t tmp;
-                HexStrToByte(p, (uint8_t *)buf, len);
+                HexStrToByte(p, buf, len);
                 len = len / 2;
                 for (i = 0; i<len; i+=4){
                     ((s8_t *)&tmp)[0] = buf[i+0];
                     ((s8_t *)&tmp)[1] = buf[i+1];
                     ((s8_t *)&tmp)[2] = buf[i+2];
                     ((s8_t *)&tmp)[3] = buf[i+3];
-                    if (Ok != /* flash¿ */){
+                    if (HAL_OK != HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, addr, tmp)){
                         printf("req:write error [%d]\r\n", addr);
                         errorflg = 1;
                     }
@@ -81,12 +138,12 @@ int debug_loop(void){
                     printf("req:write ok [%08x][%d]\r\n", addr, len);
                 }
 #ifndef BOOTFLG
-            }else if (0 == memcmp("test", saveuart, 4)){
-                printf("none\r\n");
+            }else if (0 == memcmp("time", saveuart, 4)){
+                printf("now=%d\r\n", time_delay_ms(0));
 #endif
             }else{
                 printf("error\r\n");
-                printnameandhex("hex", (char *)saveuart, saveuarti);
+                printnameandhex("hex", (s8_t *)saveuart, saveuarti);
             }
             saveuarti=0;
         }else{

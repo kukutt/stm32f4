@@ -113,7 +113,7 @@ void delay_ms_c(u32_t ms){
         for(j=0; j<5980;j++);
 }
 
-void delay_us_c(s32_t i){
+void delay_us_c(u32_t i){
    u32_t j,k;
    
    for (j = 0; j <1; j++){
@@ -127,13 +127,13 @@ void reboot(void){
 
 
 u32_t time_delay_ms(u32_t timeout){
-    return get_Tick()+timeout;
+    return HAL_GetTick()+timeout;
 }
 
 /* 判断超时 */
 bool_t time_delay_ms_check(u32_t time){
     u32_t ret = 0;
-    u32_t now = get_Tick();
+    u32_t now = HAL_GetTick();
     if (now > time){
         ret = now-time;
     }else{

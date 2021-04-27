@@ -10,14 +10,14 @@
 #include "g.h"
 
 u32_t JumpAddress;
+typedef void (*func_ptr_t)(void);
 func_ptr_t JumpToApplication;
-static en_result_t IAP_JumpToApp(u32_t u32Addr)
+static bool_t IAP_JumpToApp(u32_t u32Addr)
 {
     u32_t u32StackTop = *((__IO u32_t *)u32Addr);  //读取APP程序栈顶地址
 
     /* 判断栈顶地址有效性 */
-    if ((u32StackTop > SRAM_BASE) && (u32StackTop <= (SRAM_BASE + RAM_SIZE)))
-    {
+    if ((u32StackTop > SRAM_START) && (u32StackTop <= (SRAM_END))){
         /* 配置跳转到用户程序复位中断入口 */
         JumpAddress = *(__IO u32_t *)(u32Addr + 4);
         JumpToApplication = (func_ptr_t)JumpAddress;
@@ -26,7 +26,7 @@ static en_result_t IAP_JumpToApp(u32_t u32Addr)
         JumpToApplication();
     }
 
-    return Error;
+    return false;
 }
 
 void IAP_UpdateCheck(u32_t checkflg)

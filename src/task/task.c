@@ -26,6 +26,7 @@ task_T g_task[MAXTASKNUM];
 
 s32_t task_init(void){
     memset((char *)&g_task, 0, sizeof(g_task));
+    //task_add(task_bsp_test, 5000);
     return 0;
 }
 

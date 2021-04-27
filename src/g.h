@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include "stm32f4xx_hal.h"
 
 typedef unsigned char u8_t;
@@ -25,6 +26,7 @@ typedef char s8_t;
 typedef unsigned short u16_t;
 typedef signed short s16_t;
 typedef unsigned int u32_t;
+typedef uint64_t u64_t;
 typedef signed int s32_t;
 typedef float f32_t;
 typedef double f64_t;

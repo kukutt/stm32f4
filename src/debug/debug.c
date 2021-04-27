@@ -100,8 +100,11 @@ int debug_loop(void){
                 IAP_UpdateCheck(1);
 #endif
             }else if (0 == memcmp("iap_init", saveuart, 8)){
-                HAL_FLASH_Unlock();
-                printf("req:init ok");
+                if (HAL_OK == HAL_FLASH_Unlock()){
+                    printf("req:init ok\r\n");
+                }else{
+                    printf("req:init error\r\n");
+                }
             }else if (0 == memcmp("iap_read", saveuart, 8)){
                 s8_t *p;
                 u32_t addr = strtoul((char *)&saveuart[8], &p, 16);
@@ -110,9 +113,33 @@ int debug_loop(void){
                 printnameandhex("read", (char *)addr, len);
             }else if (0 == memcmp("iap_erase", saveuart, 9)){
                 u32_t addr = strtoul((char *)&saveuart[9], NULL, 16);
-                //while(Ok != Flash_SectorErase(addr));
-		/* flash¿¿ */
-                printf("req:erase ok [%08x]\r\n", addr);
+                s32_t sector = -1;
+                FLASH_EraseInitTypeDef EraseInitStruct;
+                uint32_t SectorError = 0;
+                
+                if ((0x8000000 <= addr) && (0x8010000 > addr)){
+                    sector = (addr-0x8000000) >> 14;
+                }else if((0x8010000 <= addr) && (0x8020000 > addr)){
+                    sector = 4;
+                }else if((0x8020000 <= addr) && (0x8100000 > addr)){
+                    sector = ((addr-0x8020000) >> 17)+5;
+                }else{
+                    sector = -1;
+                }
+                
+                if (sector >= 0){
+                    EraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
+                    EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+                    EraseInitStruct.Sector = sector;
+                    EraseInitStruct.NbSectors = 1;
+                    if(HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError) == HAL_OK){
+                        printf("req:erase ok [%08x][%d]\r\n", addr, sector);
+                    }else{
+                        printf("req:erase error1 [%08x][%d]\r\n", addr, sector);
+                    }
+                }else{
+                    printf("req:erase error2 [%08x][%d]\r\n", addr, sector);
+                }
             }else if (0 == memcmp("iap_write", saveuart, 9)){
                 s8_t buf[520];
                 s8_t *p;
@@ -125,12 +152,13 @@ int debug_loop(void){
                 HexStrToByte(p, buf, len);
                 len = len / 2;
                 for (i = 0; i<len; i+=4){
+                    tmp = 0;
                     ((s8_t *)&tmp)[0] = buf[i+0];
                     ((s8_t *)&tmp)[1] = buf[i+1];
                     ((s8_t *)&tmp)[2] = buf[i+2];
                     ((s8_t *)&tmp)[3] = buf[i+3];
-                    if (HAL_OK != HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, addr, tmp)){
-                        printf("req:write error [%d]\r\n", addr);
+                    if (HAL_OK != HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, addr+i, tmp)){
+                        printf("req:write error [%08x]\r\n", addr);
                         errorflg = 1;
                     }
                 }

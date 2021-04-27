@@ -14,7 +14,7 @@ import "strings"
 import "encoding/hex"
 
 const MAXRWLEN = 8000
-const ADDR_APP = 0x4000
+const ADDR_APP = 0x8020000
 var port string
 var file string
 var baud int
@@ -47,7 +47,6 @@ func serialrw(iorwc io.ReadWriteCloser, str string)(string){
 
     var tmpstr string = ""
     for i := 0; i < 3000; i++ {
-
         time.Sleep(time.Duration(to)*time.Millisecond);
         num, err = iorwc.Read(buffer)
         if num > 0 {
@@ -78,7 +77,7 @@ func upgrade(iorwc io.ReadWriteCloser)(int){
     serialrw(iorwc, "iap_init;")
 
     /* erase */
-    for i:=0; i < strlen; i+=512 {
+    for i:=0; i < strlen; i+=0x20000 {
         tmp := fmt.Sprintf("iap_erase %08x;", ADDR_APP+i)
         serialrw(iorwc, tmp);
     }
@@ -133,13 +132,12 @@ func test() {
                 errflg = 0;
                 break;
             }
-            
             fmt.Println(j, "app->iap", retstr)
         }
 
         retstr = serialrw(iorwc, "iap_init;")
-        retstr = serialrw(iorwc, "iap_erase 0x3ff00;")
-        retstr = serialrw(iorwc, "iap_write 0x3ff00 ad5005b0;")
+        retstr = serialrw(iorwc, "iap_erase 0800c000;")
+        retstr = serialrw(iorwc, "iap_write 0800c000 5a332211;")
         retstr = serialrw(iorwc, "reboot;")
         time.Sleep(time.Duration(500)*time.Millisecond);
 
@@ -150,7 +148,6 @@ func test() {
                 errflg = 0;
                 break;
             }
-            
             fmt.Println(j, "app->iap", retstr)
         }
         if (0 != errflg){
@@ -176,14 +173,13 @@ func test() {
                 errflg = 0;
                 break;
             }
-            
             fmt.Println(j, "app->iap", retstr)
         }
         if (0 != errflg){
             break;
         }
         retstr = serialrw(iorwc, "iap_init;")
-        retstr = serialrw(iorwc, "iap_erase 0x3ff00;")
+        retstr = serialrw(iorwc, "iap_erase 0800c000;")
         retstr = serialrw(iorwc, "reboot;")
 
         flg = 0;

@@ -16,13 +16,13 @@
 
 
 #define SRAM_START                  ((uint32_t)0x20000000)
-#define SRAM_END                    ((uint32_t)0x20002000)
+#define SRAM_END                    ((uint32_t)0x20020000)
 
-#define BOOT_PARA_ADDRESS           (0x3ff00)
+#define BOOT_PARA_ADDRESS           (0x0800c000)
 
 
-#define APP_FLAG                    0x1122335a
-#define APP_ADDRESS                 (0x4000)
+#define APP_FLAG                    (0x1122335a)
+#define APP_ADDRESS                 (0x08020000)
 
 void IAP_UpdateCheck(u32_t checkflg);
 

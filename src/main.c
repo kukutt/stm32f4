@@ -61,7 +61,6 @@ int main(void){
 
     printf("app_start\r\n");
 #else
-    printf("in boot\r\n");
     IAP_UpdateCheck(0);
     printf("boot\r\n");
 #endif

@@ -76,14 +76,10 @@
 /*!< Uncomment the following line if you need to relocate your vector Table in
      Internal SRAM. */
 /* #define VECT_TAB_SRAM */
-#ifndef BOOTFLG
-#ifdef NOIAPFLG
+#if defined(BOOTFLG) || defined(NOIAPFLG)
 #define VECT_TAB_OFFSET  0x00
 #else
 #define VECT_TAB_OFFSET  0x20000
-#endif
-#else
-#define VECT_TAB_OFFSET  0x00
 #endif
 /******************************************************************************/
 

@@ -6,3 +6,6 @@
 /build/MDK-ARM/RTE/
 /build/MDK-ARM/demo.uvoptx
 /build/MDK-ARM/demo.uvguix.*
+/build/MDK-ARM/demo_app
+/build/MDK-ARM/demo_boot
+/build/MDK-ARM/bin

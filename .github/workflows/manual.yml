@@ -6,6 +6,7 @@ jobs:
   build-gcc:
     runs-on: ubuntu-18.04
     steps:
+    - uses: actions/checkout@v2
     - name: build
       run: pushd build/gcc/ ; ./auto.sh ; popd
     - uses: actions/upload-artifact@v2

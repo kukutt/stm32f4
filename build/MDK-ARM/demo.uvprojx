@@ -336,9 +336,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--C99</MiscControls>
-              <Define>USE_HAL_DRIVER,STM32F407xx,USE_STM32F4_DISCO,NOIAPFLG</Define>
+              <Define>USE_HAL_DRIVER,STM32F407xx,NOIAPFLG</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\src;..\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include;..\..\Drivers\STM32F4xx_HAL_Driver\Inc</IncludePath>
+              <IncludePath>..\..\src;..\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include;..\..\Drivers\STM32F4xx_HAL_Driver\Inc;..\..\Drivers\CMSIS\Include\</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -849,9 +849,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--C99</MiscControls>
-              <Define>USE_HAL_DRIVER,STM32F407xx,USE_STM32F4_DISCO,BOOTFLG</Define>
+              <Define>USE_HAL_DRIVER,STM32F407xx,BOOTFLG</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\src;..\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include;..\..\Drivers\STM32F4xx_HAL_Driver\Inc</IncludePath>
+              <IncludePath>..\..\src;..\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include;..\..\Drivers\STM32F4xx_HAL_Driver\Inc;..\..\Drivers\CMSIS\Include\</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1431,9 +1431,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--C99</MiscControls>
-              <Define>USE_HAL_DRIVER,STM32F407xx,USE_STM32F4_DISCO</Define>
+              <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\src;..\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include;..\..\Drivers\STM32F4xx_HAL_Driver\Inc</IncludePath>
+              <IncludePath>..\..\src;..\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include;..\..\Drivers\STM32F4xx_HAL_Driver\Inc;..\..\Drivers\CMSIS\Include\</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

@@ -67,6 +67,11 @@ s32_t debug_init(void){
     return 0;
 }
 
+int _write (int fd, char *pBuffer, int size){
+    HAL_UART_Transmit(&UartHandle, (uint8_t*)pBuffer, size, 500);
+    return size;
+}
+
 int fputc(int ch, FILE *f){
     s8_t tmp = ch;
     HAL_UART_Transmit(&UartHandle, (uint8_t*)&tmp, 1, 500);

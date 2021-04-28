@@ -47,12 +47,25 @@ func serialrw(iorwc io.ReadWriteCloser, str string)(string){
 
     var tmpstr string = ""
     for i := 0; i < 3000; i++ {
-        time.Sleep(time.Duration(to)*time.Millisecond);
+        time.Sleep(time.Duration(1)*time.Millisecond);
         num, err = iorwc.Read(buffer)
         if num > 0 {
             tmpstr += fmt.Sprintf("%s", string(buffer[:num]))
-        }else{
-            break;
+	    if (len(tmpstr) > 2){
+                break;
+	    }
+        }
+    }
+
+    if (len(tmpstr) > 2){
+        for i := 0; i < 3000; i++ {
+            time.Sleep(time.Duration(to)*time.Millisecond);
+            num, err = iorwc.Read(buffer)
+            if num > 0 {
+                tmpstr += fmt.Sprintf("%s", string(buffer[:num]))
+            }else{
+                break;
+            }
         }
     }
 

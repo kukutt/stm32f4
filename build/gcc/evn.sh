@@ -14,7 +14,7 @@ echo work dir [$homePath] [$workPath]
     rm -rf gcc-arm-none-eabi-5_4-2016q3-20160926-linux.tar.bz2
     popd
 }
-export PATH=$homePath/gcc-arm-none-eabi-5_4-2016q3/bin/:$PATH
+export PATH=$homePath/evn/bin/:$PATH
 
 echo $PATH
 

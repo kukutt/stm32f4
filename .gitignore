@@ -10,5 +10,5 @@
 /build/MDK-ARM/demo_boot
 /build/MDK-ARM/bin
 /build/gcc/evn
-/build/gcc/build
+/build/gcc/build*
 /build/gcc/bin

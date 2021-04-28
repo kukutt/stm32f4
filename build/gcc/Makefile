@@ -1,7 +1,25 @@
 ######################################
 # target
 ######################################
+BUILD_PREFIX = build
+ifeq ($(out), noiap)
 TARGET = demo
+BUILD_DIR = $(BUILD_PREFIX)
+TGDEF = -DNOIAPFLG
+LDFILE = STM32F407VETx_FLASH.ld
+else ifeq ($(out), boot)
+TARGET = demo_boot
+BUILD_DIR = $(BUILD_PREFIX)_boot
+TGDEF = -DBOOTFLG 
+LDFILE = STM32F407VETx_FLASH_boot.ld
+else
+TARGET = demo_app
+BUILD_DIR = $(BUILD_PREFIX)_app
+TGDEF = 
+LDFILE = STM32F407VETx_FLASH_app.ld
+endif
+
+BIN_DIR = bin
 WORKDIR = $(PWD)/../../
 
 
@@ -12,14 +30,6 @@ WORKDIR = $(PWD)/../../
 DEBUG = 1
 # optimization
 OPT = -Og
-
-
-#######################################
-# paths
-#######################################
-# Build path
-BUILD_DIR = build
-BIN_DIR = bin
 
 ######################################
 # source
@@ -89,7 +99,7 @@ AS_DEFS =
 C_DEFS =  \
 -DUSE_HAL_DRIVER \
 -DSTM32F407xx
-
+C_DEFS += $(TGDEF)
 
 # AS includes
 AS_INCLUDES = 
@@ -120,7 +130,7 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 # LDFLAGS
 #######################################
 # link script
-LDSCRIPT = STM32F407VETx_FLASH.ld
+LDSCRIPT = $(LDFILE)
 
 # libraries
 LIBS = -lc -lm -lnosys 
@@ -128,7 +138,7 @@ LIBDIR =
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 
 # default action: build all
-all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BIN_DIR)/$(TARGET).bin
+all: $(BIN_DIR) $(BUILD_DIR) $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BIN_DIR)/$(TARGET).bin
 
 
 #######################################
@@ -160,11 +170,16 @@ $(BIN_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
 $(BUILD_DIR):
 	mkdir $@		
 
+$(BIN_DIR):
+	mkdir $@		
+
 #######################################
 # clean up
 #######################################
 clean:
-	-rm -fR $(BUILD_DIR)
+	-rm -fR $(BUILD_PREFIX)*
+cleanall:
+	-rm -fR $(BUILD_PREFIX)* $(BIN_DIR)
   
 #######################################
 # dependencies

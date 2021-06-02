@@ -40,6 +40,7 @@ typedef unsigned char bool_t;
 #include "iap/iap.h"
 #include "task/task.h"
 #include "debug/debug.h"
+#include "param/param.h"
 
 
 void printnameandhex(s8_t *name, s8_t *str, s32_t len);

@@ -58,6 +58,7 @@ int main(void){
     debug_init();
 #ifndef BOOTFLG
     task_init();
+    param_init();
 
     printf("app_start\r\n");
 #else

@@ -11,8 +11,8 @@
 #ifndef __G_H__
 #define __G_H__
 
-#define BOOTVER "V0.8.8"
-#define APPVER  "V0.8.8"
+#define BOOTVER "V0.8.9"
+#define APPVER  "V0.8.9"
 
 /* 导入系统头文件 */
 #include <stdio.h>
@@ -51,5 +51,17 @@ void delay_us_c(u32_t i);
 void reboot(void);
 u32_t time_delay_ms(u32_t timeout);
 bool_t time_delay_ms_check(u32_t time);
+
+/* fifo buf */
+typedef struct {
+    uint16_t w;
+    uint16_t r;
+    uint16_t len;
+    uint16_t ref;
+    uint8_t *buf;
+}FIFO_CTRL;
+int fifo_init(FIFO_CTRL *ctl, uint8_t *buf, uint16_t len);
+int fifo_write(uint8_t data, FIFO_CTRL *ctl);
+int fifo_read(uint8_t *data, FIFO_CTRL *ctl);
 
 #endif /* __G_H__ */

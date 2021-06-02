@@ -151,3 +151,30 @@ bool_t time_delay_ms_check(u32_t time){
     }
 }
 
+
+int fifo_init(FIFO_CTRL *ctl, uint8_t *buf, uint16_t len){
+    memset((char *)ctl, 0, sizeof(FIFO_CTRL));
+    ctl->buf = buf;
+    ctl->len = len;
+    
+    return 0;
+}
+
+int fifo_write(uint8_t data, FIFO_CTRL *ctl){
+    if (((ctl->w+1)%ctl->len) != (ctl->r%ctl->len)){
+        ctl->buf[ctl->w] = data;
+        ctl->w = (ctl->w + 1) % ctl->len;
+    }
+    return 0;
+}
+
+int fifo_read(uint8_t *data, FIFO_CTRL *ctl){
+    int ret = 0;
+    if (ctl->w != ctl->r){
+        ret = 1;
+        *data = ctl->buf[ctl->r];
+        ctl->r = (ctl->r + 1) % ctl->len;
+    }
+    return ret;
+}
+

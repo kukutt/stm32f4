@@ -7,7 +7,7 @@
   * @brief  : 调试功能
   ******************************************************************************
 */
-#include "g.h"
+#include "debug.h"
 
 UART_HandleTypeDef UartHandle;
 #define USARTx                           USART1
@@ -17,6 +17,9 @@ UART_HandleTypeDef UartHandle;
 
 #define USARTx_FORCE_RESET()             __HAL_RCC_USART1_FORCE_RESET()
 #define USARTx_RELEASE_RESET()           __HAL_RCC_USART1_RELEASE_RESET()
+
+#define USARTx_IRQn                      USART1_IRQn
+#define USARTx_IRQHandler                USART1_IRQHandler
     
 /* Definition for USARTx Pins */
 #define USARTx_TX_PIN                    GPIO_PIN_9
@@ -25,6 +28,16 @@ UART_HandleTypeDef UartHandle;
 #define USARTx_RX_PIN                    GPIO_PIN_10
 #define USARTx_RX_GPIO_PORT              GPIOA 
 #define USARTx_RX_AF                     GPIO_AF7_USART1
+
+uint8_t debugfifobuf[32];
+FIFO_CTRL debugfifo;
+
+void USARTx_IRQHandler(void){
+    uint32_t isrflags   = READ_REG(UartHandle.Instance->SR);
+    if ((isrflags & USART_SR_RXNE) != RESET){
+        fifo_write((uint16_t)(UartHandle.Instance->DR & (uint16_t)0x00FF), &debugfifo);
+    }
+}
 
 s32_t debug_init(void){
     GPIO_InitTypeDef  GPIO_InitStruct;
@@ -64,6 +77,21 @@ s32_t debug_init(void){
     if(HAL_UART_Init(&UartHandle) != HAL_OK){
         while(1);
     }
+    __HAL_UART_ENABLE_IT(&UartHandle, UART_IT_RXNE);
+    HAL_NVIC_SetPriority(USARTx_IRQn, 0, 1);
+    HAL_NVIC_EnableIRQ(USARTx_IRQn);
+    
+    /* DEBUG IO */
+    DEBUGIO_RESET();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    GPIO_InitStruct.Pin = DEBUG_IO;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(DEBUG_PORT, &GPIO_InitStruct);
+    
+    
+    fifo_init(&debugfifo, debugfifobuf, sizeof(debugfifobuf));
     return 0;
 }
 
@@ -87,7 +115,7 @@ uint8_t saveuart[MAXUARTLEN+4];
 uint16_t saveuarti=0;
 int debug_loop(void){
     char g_uartData;
-    if(HAL_UART_Receive(&UartHandle, (uint8_t *)&g_uartData, 1, 500) == HAL_OK){
+    if(fifo_read((uint8_t *)&g_uartData, &debugfifo)){
         if ((g_uartData == '\r') || (g_uartData == '\n') || (g_uartData == ';') || (saveuarti > MAXUARTLEN)){
             saveuart[saveuarti] = 0;
             printf("\r\n");

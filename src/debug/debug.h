@@ -14,7 +14,7 @@
 
 /* debug 测试时间的接口 */
 #define DEBUG_PORT          GPIOB
-#define DEBUG_IO		    GPIO_PIN_3
+#define DEBUG_IO		    GPIO_PIN_6
 #define DEBUGIO_RESET()     HAL_GPIO_WritePin(DEBUG_PORT, DEBUG_IO, GPIO_PIN_RESET)
 #define DEBUGIO_SET()       HAL_GPIO_WritePin(DEBUG_PORT, DEBUG_IO, GPIO_PIN_SET)
 #define DEBUGIO_TOGGLE()    HAL_GPIO_TogglePin(DEBUG_PORT, DEBUG_IO)

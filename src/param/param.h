@@ -15,6 +15,8 @@
 
 #define BYTESPBLOCK (4096)
 
+#define PARAM_SYS(A)    {A;param_sync();}
+
 typedef struct{
     uint32_t magic;
     uint16_t checkSum;

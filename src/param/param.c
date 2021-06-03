@@ -17,6 +17,8 @@ SysParam g_Param;
 int param_init(void){
     param_bsp_init();
     param_sync();
+    PARAM_SYS(g_Param.rebootCount++);
+    printf("reboot count = %d\r\n", g_Param.rebootCount);
     return 0;
 }
 
@@ -42,7 +44,6 @@ uint16_t genCheck(SysParam *in){
     in->checkSum = temp;
     return crc;
 }
-
 
 int param_sync(void){
     uint32_t tmpMagic1 = 0;
@@ -83,7 +84,7 @@ int param_sync(void){
         g_Param.checkSum = 0;
     }
 
-#if 1
+#if 0
     char showparam[16];
     memset(showparam, 0, sizeof(showparam));
     param_bsp_read((unsigned char *)showparam, PARAM1_ADDR, sizeof(showparam));

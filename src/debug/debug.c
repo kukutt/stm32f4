@@ -201,6 +201,16 @@ int debug_loop(void){
 #ifndef BOOTFLG
             }else if (0 == memcmp("time", saveuart, 4)){
                 printf("now=%d\r\n", time_delay_ms(0));
+            }else if (0 == memcmp("gen", saveuart, 3)){
+                char *pp = (char *)&saveuart[3];
+                uint32_t offset = strtoul(pp, &pp, 10);
+                uint32_t data = strtoul(pp, &pp, 10);
+                gen_data(offset, data);
+            }else if (0 == memcmp("cap", saveuart, 3)){
+                dsm_if_start1();
+                dsm_if_wait();
+                dsm_if_stop();
+                dsm_print("adcv", 0);
 #endif
             }else{
                 printf("error\r\n");

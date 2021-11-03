@@ -59,6 +59,8 @@ int main(void){
 #ifndef BOOTFLG
     task_init();
     param_init();
+    gen_init();
+    cap_init();
 
     printf("app_start\r\n");
 #else

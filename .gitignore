@@ -12,3 +12,4 @@
 /build/gcc/evn
 /build/gcc/build*
 /build/gcc/bin
+/tools/cmd/data

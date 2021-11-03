@@ -15,7 +15,6 @@ u16_t ADC_Value[TEST_LENGTH_SAMPLES];
 
 extern ADC_HandleTypeDef hadc2;
 extern DMA_HandleTypeDef hdma_adc2;
-extern TIM_HandleTypeDef htim8;
 volatile int dma_IT_flag=1;
 
 /* adc */

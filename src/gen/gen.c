@@ -37,7 +37,6 @@ static DAC_ChannelConfTypeDef sConfig;
 uint8_t aEscalator8bit[1024];
 uint8_t aEscalator8bit_tmp[1024];
 
-
 void DACx_DMA_IRQHandler1(void)
 {
   HAL_DMA_IRQHandler(DacHandle.DMA_Handle1);
@@ -120,27 +119,27 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *htim){
 }
 
 
+static TIM_HandleTypeDef  htim6;
 void TIM6_Config(void){
-  static TIM_HandleTypeDef  htim;
   TIM_MasterConfigTypeDef sMasterConfig;
   
   /*##-1- Configure the TIM peripheral #######################################*/
   /* Time base configuration */
-  htim.Instance = TIM6;
-  htim.Init.Period = TIM6_PERIOD-1;          
-  htim.Init.Prescaler = TIM6_PRESCALER-1;       
-  htim.Init.ClockDivision = 0;    
-  htim.Init.CounterMode = TIM_COUNTERMODE_UP; 
-  HAL_TIM_Base_Init(&htim);
+  htim6.Instance = TIM6;
+  htim6.Init.Period = TIM6_PERIOD-1;          
+  htim6.Init.Prescaler = TIM6_PRESCALER-1;       
+  htim6.Init.ClockDivision = 0;    
+  htim6.Init.CounterMode = TIM_COUNTERMODE_UP; 
+  HAL_TIM_Base_Init(&htim6);
 
   /* TIM6 TRGO selection */
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
 
-  HAL_TIMEx_MasterConfigSynchronization(&htim, &sMasterConfig);
+  HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig);
   
   /*##-2- Enable TIM peripheral counter ######################################*/
-  HAL_TIM_Base_Start(&htim);
+  HAL_TIM_Base_Start(&htim6);
 }
 
 
@@ -177,16 +176,40 @@ int gen_init(void){
     return 0;
 }
 
-s32_t gen_data(u32_t offset, u8_t data){
-    int i = 0;
-    if (offset <= sizeof(aEscalator8bit)){
-        printf("[%d]%d\r\n", offset, data);
-        aEscalator8bit_tmp[offset] = data;
-    }else{
+s32_t gen_data(u8_t *data){
+    s8_t buf[64];
+    s8_t *p;
+    s32_t i;
+    u32_t cmd = strtoul((char *)data, &p, 10);
+    printf("cmd = %d\r\n", cmd);
+    if (cmd == 0){
+        u32_t addr = strtoul((char *)p, &p, 10);
+        u32_t len = strtoul((char *)p, &p, 10);
+        printf("[1]addr = %d, len=%d\r\n", addr, len);
+        while(p[0] == 0x20)p++;
+        HexStrToByte(p, buf, len*2);
+        for (i = 0; i<len; i++){
+            aEscalator8bit_tmp[addr+i] = buf[i];
+        }
+    }else if (cmd == 1){
+        for (i = 0; i < sizeof(aEscalator8bit_tmp); i++){
+            printf("%d\r\n", aEscalator8bit_tmp[i]);
+        }
+    }else if (cmd == 2){
+        u32_t arr = strtoul((char *)p, &p, 10);
+        u32_t psc = strtoul((char *)p, &p, 10);
+        printf("old %d %d\r\n", htim6.Instance->ARR, htim6.Instance->PSC);
+        htim6.Instance->ARR = arr;
+        htim6.Instance->PSC = psc;
+        printf("new %d %d\r\n", htim6.Instance->ARR, htim6.Instance->PSC);
+    }else if (cmd == 100){
         printf("update\r\n");
-        for (i = 0; i < sizeof(aEscalator8bit); i++){
+        for (i = 0; i < sizeof(aEscalator8bit_tmp); i++){
             aEscalator8bit[i] = aEscalator8bit_tmp[i];
         }
+    }else{
+        printf("cmd error\r\n");
     }
+    
     return 0;
 }

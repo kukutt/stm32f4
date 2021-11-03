@@ -13,6 +13,6 @@
 #include "g.h"
 
 extern int gen_init(void);
-extern s32_t gen_data(u32_t offset, u8_t data);
+extern s32_t gen_data(u8_t *data);
 
 #endif /*__GEN_H__*/

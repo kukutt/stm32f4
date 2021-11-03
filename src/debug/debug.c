@@ -106,11 +106,7 @@ int fputc(int ch, FILE *f){
     return ch;
 }
 
-#ifdef BOOTFLG
 #define MAXUARTLEN 1200
-#else
-#define MAXUARTLEN 128
-#endif
 uint8_t saveuart[MAXUARTLEN+4];
 uint16_t saveuarti=0;
 int debug_loop(void){
@@ -203,9 +199,7 @@ int debug_loop(void){
                 printf("now=%d\r\n", time_delay_ms(0));
             }else if (0 == memcmp("gen", saveuart, 3)){
                 char *pp = (char *)&saveuart[3];
-                uint32_t offset = strtoul(pp, &pp, 10);
-                uint32_t data = strtoul(pp, &pp, 10);
-                gen_data(offset, data);
+                gen_data((u8_t *)pp);
             }else if (0 == memcmp("cap", saveuart, 3)){
                 dsm_if_start1();
                 dsm_if_wait();

@@ -10,7 +10,7 @@
 #include "cap.h"
 
 #define OFFSET 802
-#define TEST_LENGTH_SAMPLES (8000+OFFSET)
+#define TEST_LENGTH_SAMPLES (10000+OFFSET)
 u16_t ADC_Value[TEST_LENGTH_SAMPLES];
 
 extern ADC_HandleTypeDef hadc2;
@@ -259,7 +259,7 @@ int dsm_print(const char *p, int len){
     if (len != 0)maxlen = len;
     printf("%s:\r\n", p);
     for (i = OFFSET; i < maxlen; i++){
-        printf("%d,%d\r\n", i, ADC_Value[i]);
+        printf("%d,%d\r\n", i-OFFSET, ADC_Value[i]);
     }
     printf("%s:\r\n", p);
     
@@ -272,4 +272,30 @@ u16_t *dsm_bufget(void){
 
 s32_t dsm_buflenget(void){
     return TEST_LENGTH_SAMPLES;
+}
+
+s32_t cap_data(u8_t *data){
+    s8_t *p;
+    u32_t cmd = strtoul((char *)data, &p, 10);
+    printf("cmd = %d\r\n", cmd);
+    if (cmd == 0){
+        dsm_if_start1();
+        dsm_if_wait();
+        dsm_if_stop();
+        dsm_print("adcv", 0);
+    }else if (cmd == 1){
+        ;
+    }else if (cmd == 2){
+        u32_t arr = strtoul((char *)p, &p, 10);
+        u32_t psc = strtoul((char *)p, &p, 10);
+        printf("old %d %d\r\n", htim8.Instance->ARR, htim8.Instance->PSC);
+        htim8.Instance->ARR = arr;
+        htim8.Instance->PSC = psc;
+        printf("new %d %d\r\n", htim8.Instance->ARR, htim8.Instance->PSC);
+        ;
+    }else{
+        printf("cmd error\r\n");
+    }
+    
+    return 0;
 }

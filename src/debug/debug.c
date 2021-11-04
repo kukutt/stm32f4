@@ -201,10 +201,8 @@ int debug_loop(void){
                 char *pp = (char *)&saveuart[3];
                 gen_data((u8_t *)pp);
             }else if (0 == memcmp("cap", saveuart, 3)){
-                dsm_if_start1();
-                dsm_if_wait();
-                dsm_if_stop();
-                dsm_print("adcv", 0);
+                char *pp = (char *)&saveuart[3];
+                cap_data((u8_t *)pp);
 #endif
             }else{
                 printf("error\r\n");

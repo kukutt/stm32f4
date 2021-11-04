@@ -22,7 +22,7 @@ tim8的采样频率168M
 100000            1600 			10/168
 实际频率=168M/TIM8_Period/TIM8_Prescaler
 */
-#define TIM8_Prescaler 210
+#define TIM8_Prescaler 168
 #define TIM8_Period 100
 
 void MX_ADC2_Init(void);
@@ -37,5 +37,6 @@ int dsm_print(const char *p, int len);
 int dsm_init(void);
 u16_t *dsm_bufget(void);
 s32_t dsm_buflenget(void);
+s32_t cap_data(u8_t *data);
 
 #endif /*__CAP_H__*/

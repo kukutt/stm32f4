@@ -14,13 +14,19 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("m", choices = ['test', 'gen', 'cap'])
 parser.add_argument("-port", help="串口端口", default="COM12")
+parser.add_argument("-garr", help="生成波形的arr", default=42)
+parser.add_argument("-gpsc", help="生成波形的psc", default=2)
+parser.add_argument("-carr", help="采集波形的arr", default=100)
+parser.add_argument("-cpsc", help="采集波形的psc", default=168)
 parser.add_argument("-capname", help="记录波形名字", default="mz2\\cap_20210809155738.csv")
 args = parser.parse_args()
 
 def gen():
     N = 1000
     tt = np.arange(0,N)
-    xx = 127*np.cos(2*np.pi*tt/N)+127
+    xx = 50*np.cos(2*np.pi*tt/N)
+    xx = xx + 50*np.cos(2*np.pi*tt/N*2)
+    xx = xx + 127
     xx = xx.astype("uint8")
     #print(xx.dtype, len(xx))
     for iii in range(0,len(xx),50):
@@ -35,11 +41,9 @@ def gen():
         if (int(tmponestr[iii]) != xx[iii-2]):
             print("error", iii, tmponestr[iii], xx[iii]);
             return
-    arr = 42
-    psc = 2
-    ff = 84000000 / (arr*psc*N)
+    ff = 84000000 / (args.garr*args.gpsc*N)
     print("ff =", ff);
-    count=serif.DWritePort(ser, "gen 2 %d %d;" % (arr-1,psc-1))
+    count=serif.DWritePort(ser, "gen 2 %d %d;" % (args.garr-1,args.gpsc-1))
     strtmp = serif.DReadPort(ser)
     print(strtmp)
     count=serif.DWritePort(ser, "gen 100;")
@@ -48,27 +52,54 @@ def gen():
     return
 
 
-def draw(filestr, flg):
+def draw(filestr, flg, Fs):
     data = pd.read_csv(filestr, encoding='gbk')
     print(data)
+    Ns = len(data)
+    print("Fs =", Fs, "Ns =", Ns);
     xdata = data.loc[:,"x"]
     ydata = data.loc[:,"y"]
+    xdata = xdata/Fs;
+    ydata = ydata/4096*3.3;
     plt.plot(xdata,ydata)
+    if (flg == 1):
+        plt.show()
+
+    fftytmp=fft(ydata.values)
+    # 画幅度谱
+    ffty=np.abs(fftytmp)
+    ffty= (ffty/Ns)*2;
+    Ns = len(ffty)
+    fftt=np.arange(0, Fs, Fs/Ns) 
+    endpoint = int(len(fftt)/2)
+    plt.plot(fftt[1:endpoint], ffty[1:endpoint])
+    if (flg == 1):
+        plt.show()
+
+    # 画相位谱
+    ffta = np.angle(fftytmp);
+    plt.plot(fftt[1:endpoint], ffta[1:endpoint])
     if (flg == 1):
         plt.show()
 
 def cap():
     filestr = "data\\cap_%s.csv" % (time.strftime("%Y%m%d%H%M%S", time.localtime()));
     f = open(filestr, "wb")
-    count=serif.DWritePort(ser, "cap;")
+
+    ff = 168000000 / (args.carr*args.cpsc)
+    count=serif.DWritePort(ser, "cap 2 %d %d;" % (args.carr-1, args.cpsc-1))
+    strtmp = serif.DReadPort(ser)
+    print(strtmp)
+
+    count=serif.DWritePort(ser, "cap 0;")
     strtmp = serif.DReadPortV20(ser)
     #print(strtmp)
     strlist = strtmp.split('adcv:\r\n')
-    print(strlist[1]);
+    #print(strlist[1]);
     f.write(str("x,y\r\n").encode("gbk"))
     f.write(strlist[1].encode("gbk"))
     f.close()
-    draw(filestr, 1)
+    draw(filestr, 1, ff)
     return filestr
 
 def test():

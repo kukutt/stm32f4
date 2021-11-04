@@ -144,7 +144,7 @@ void TIM6_Config(void){
 
 
 void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef *hdac){
-    dsm_if_start2();
+    cap_if_start2();
 }
 
 extern s32_t gen_const_wave(u8_t *p, u32_t len, u32_t a, u32_t offset);

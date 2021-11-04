@@ -25,18 +25,8 @@ tim8的采样频率168M
 #define TIM8_Prescaler 168
 #define TIM8_Period 100
 
-void MX_ADC2_Init(void);
-
 int cap_init(void);
-
-int dsm_if_start1(void);
-int dsm_if_start2(void);
-int dsm_if_stop(void);
-int dsm_if_wait(void);
-int dsm_print(const char *p, int len);
-int dsm_init(void);
-u16_t *dsm_bufget(void);
-s32_t dsm_buflenget(void);
+int cap_if_start2(void);
 s32_t cap_data(u8_t *data);
 
 #endif /*__CAP_H__*/

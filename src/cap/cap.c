@@ -208,13 +208,13 @@ int cap_init(void){
 }
 
 
-int dsm_if_start1(void){
+int cap_if_start1(void){
 	memset((char *)ADC_Value, 0, sizeof(ADC_Value));
 	dma_IT_flag = 0;
 	return 0;
 }
 
-int dsm_if_start2(void){
+int cap_if_start2(void){
     if (dma_IT_flag != 0)return -1;
 #ifdef TIM8_INT
     HAL_TIM_Base_Start_IT(&htim8);
@@ -226,7 +226,7 @@ int dsm_if_start2(void){
 }
 
 
-int dsm_if_stop(void){
+int cap_if_stop(void){
     HAL_ADC_Stop_DMA(&hadc2);
 #ifndef TIM8_INT
     HAL_TIM_Base_Stop(&htim8);
@@ -235,13 +235,13 @@ int dsm_if_stop(void){
 }
 
 
-int dsm_if_wait(void){
+int cap_if_wait(void){
     while(dma_IT_flag==0){
     }
     return 0;
 }
 
-int dsm_cb(void){
+int cap_cb(void){
     dma_IT_flag = 1;
 	return 0;
 }
@@ -249,10 +249,10 @@ int dsm_cb(void){
 
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc){
-    dsm_cb();
+    cap_cb();
 }
 
-int dsm_print(const char *p, int len){
+int cap_print(const char *p, int len){
     int i = 0;
     int maxlen = TEST_LENGTH_SAMPLES;
     
@@ -266,23 +266,15 @@ int dsm_print(const char *p, int len){
     return 0;
 }
 
-u16_t *dsm_bufget(void){
-    return ADC_Value;
-}
-
-s32_t dsm_buflenget(void){
-    return TEST_LENGTH_SAMPLES;
-}
-
 s32_t cap_data(u8_t *data){
     s8_t *p;
     u32_t cmd = strtoul((char *)data, &p, 10);
     printf("cmd = %d\r\n", cmd);
     if (cmd == 0){
-        dsm_if_start1();
-        dsm_if_wait();
-        dsm_if_stop();
-        dsm_print("adcv", 0);
+        cap_if_start1();
+        cap_if_wait();
+        cap_if_stop();
+        cap_print("adcv", 0);
     }else if (cmd == 1){
         ;
     }else if (cmd == 2){

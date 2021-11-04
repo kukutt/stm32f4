@@ -18,13 +18,13 @@ parser.add_argument("-capname", help="记录波形名字", default="mz2\\cap_202
 args = parser.parse_args()
 
 def gen():
-    N = 1024
+    N = 1000
     tt = np.arange(0,N)
     xx = 127*np.cos(2*np.pi*tt/N)+127
     xx = xx.astype("uint8")
     #print(xx.dtype, len(xx))
-    for iii in range(0,len(xx),32):
-        count=serif.DWritePort(ser, "gen 0 %d 32 %s;" % (tt[iii], xx[iii:iii+32].tobytes().hex()))
+    for iii in range(0,len(xx),50):
+        count=serif.DWritePort(ser, "gen 0 %d 50 %s;" % (tt[iii], xx[iii:iii+50].tobytes().hex()))
         strtmp = serif.DReadPort(ser)
         print(strtmp)
     count=serif.DWritePort(ser, "gen 1;")
@@ -35,7 +35,7 @@ def gen():
         if (int(tmponestr[iii]) != xx[iii-2]):
             print("error", iii, tmponestr[iii], xx[iii]);
             return
-    arr = 32
+    arr = 42
     psc = 2
     ff = 84000000 / (arr*psc*N)
     print("ff =", ff);

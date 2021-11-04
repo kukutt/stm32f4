@@ -34,8 +34,8 @@ DAC_HandleTypeDef    DacHandle;
 static DAC_ChannelConfTypeDef sConfig;
 #define TIM6_PERIOD 84
 #define TIM6_PRESCALER 2
-uint8_t aEscalator8bit[1024];
-uint8_t aEscalator8bit_tmp[1024];
+uint8_t aEscalator8bit[1000];
+uint8_t aEscalator8bit_tmp[1000];
 
 void DACx_DMA_IRQHandler1(void)
 {
@@ -177,7 +177,7 @@ int gen_init(void){
 }
 
 s32_t gen_data(u8_t *data){
-    s8_t buf[64];
+    s8_t buf[100];
     s8_t *p;
     s32_t i;
     u32_t cmd = strtoul((char *)data, &p, 10);
@@ -207,6 +207,8 @@ s32_t gen_data(u8_t *data){
         for (i = 0; i < sizeof(aEscalator8bit_tmp); i++){
             aEscalator8bit[i] = aEscalator8bit_tmp[i];
         }
+    }else if (cmd == 101){
+        printf("len = %d\r\n", sizeof(aEscalator8bit));
     }else{
         printf("cmd error\r\n");
     }

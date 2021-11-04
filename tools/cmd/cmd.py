@@ -13,12 +13,12 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("m", choices = ['test', 'gen', 'cap'])
-parser.add_argument("-port", help="串口端口", default="COM12")
-parser.add_argument("-garr", help="生成波形的arr", default=42)
-parser.add_argument("-gpsc", help="生成波形的psc", default=2)
-parser.add_argument("-carr", help="采集波形的arr", default=100)
-parser.add_argument("-cpsc", help="采集波形的psc", default=168)
-parser.add_argument("-capname", help="记录波形名字", default="mz2\\cap_20210809155738.csv")
+parser.add_argument("-port", help="串口端口 %(default)s)", default="COM12")
+parser.add_argument("-garr", help="生成波形的arr %(default)s", default=42, type=int)
+parser.add_argument("-gpsc", help="生成波形的psc %(default)s", default=2, type=int)
+parser.add_argument("-carr", help="采集波形的arr %(default)s", default=100, type=int)
+parser.add_argument("-cpsc", help="采集波形的psc %(default)s", default=168, type=int)
+parser.add_argument("-capname", help="记录波形名字 %(default)s", default="mz2\\cap_20210809155738.csv")
 args = parser.parse_args()
 
 def gen():

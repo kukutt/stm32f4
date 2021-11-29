@@ -24,8 +24,8 @@ args = parser.parse_args()
 def gen():
     N = 1000
     tt = np.arange(0,N)
-    xx = 50*np.cos(2*np.pi*tt/N)
-    xx = xx + 50*np.cos(2*np.pi*tt/N*2)
+    xx = 100*np.cos(2*np.pi*tt/N)
+    #xx = xx + 50*np.cos(2*np.pi*tt/N*2)
     xx = xx + 127
     xx = xx.astype("uint8")
     #print(xx.dtype, len(xx))
@@ -77,10 +77,11 @@ def draw(filestr, flg, Fs):
         plt.show()
 
     # 画相位谱
-    ffta = np.angle(fftytmp);
+    ffta = np.angle(fftytmp)/np.pi*180;
     plt.plot(fftt[1:endpoint], ffta[1:endpoint])
     if (flg == 1):
         plt.show()
+    print(1000, ffty[1000], ffta[1000])
 
 def cap():
     filestr = "data\\cap_%s.csv" % (time.strftime("%Y%m%d%H%M%S", time.localtime()));
